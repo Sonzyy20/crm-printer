@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Надпись на изображении</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    canvas {
+      border: 1px solid red;
+      display: block;
+      margin-bottom: 10px;
+      display:none;
+    }
+    input, button {
+      margin: 5px 0;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Введите текст и скачайте изображение</h2>
+  <canvas id="myCanvas" width="1241" height="1754"></canvas>
+
+  <input type="text" id="textInput" placeholder="Введите текст" />
+    <input type="text" id="textInput2" placeholder="ведите получателя" />
+  <br>
+  <button onclick="drawText()">Обновить текст</button>
+  <button onclick="downloadImage()">Скачать изображение</button>
+
+  <script>
+    const canvas = document.getElementById("myCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const image = new Image();
+    image.src = "./DokumentCMR_page-0003.jpg"; // Замените на путь к своему изображению
+
+    image.onload = function () {
+      drawText(); // Рисуем сразу при загрузке
+    };
+
+    function drawText() {
+      const text = document.getElementById("textInput").value;
+      const text2 = document.getElementById("textInput2").value
+
+      // Очистка и отрисовка фона
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      // Настройка текста
+      ctx.font = "30px Arial";
+      ctx.fillStyle = "black";
+      ctx.fillText(text, 150, 250); // координаты текста
+      ctx.fillText(text2, 150, 350); 
+    }
+
+    function downloadImage() {
+      const link = document.createElement('a');
+      link.download = 'image-with-text.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>

@@ -1,68 +1,203 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <title>Надпись на изображении</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    canvas {
-      border: 1px solid red;
-      display: block;
-      margin-bottom: 10px;
-      display:none;
-    }
-    input, button {
-      margin: 5px 0;
-      padding: 8px;
-    }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Текст на изображениях + PDF</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      .canvas-block {
+        display: inline-block;
+        margin: 10px;
+        text-align: center;
+      }
+      canvas {
+        border: 1px solid #ccc;
+        display: block;
+        margin-bottom: 5px;
+      }
+      textarea,
+      button {
+        display: block;
+        margin: 5px 0;
+        padding: 8px;
+        /* width: 300px; */
+        font-family: sans-serif;
+        font-size: 16px;
+      }
+      .textareawrap {
+        display: flex;
+      }
+      .textareas-row {
+        margin-right: 20px;
+      }
+      .THtextareas {
+        display: flex;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  </head>
+  <body>
+    <h2>Введите тексты</h2>
+    <div class="textareawrap">
+      <div class="textareas-row">
+        <textarea id="text1" rows="3" placeholder="От кого"></textarea>
+        <textarea id="text2" rows="3" placeholder="Кому"></textarea>
+        <div class="THtextareas">
+          <textarea id="text3" rows="3" placeholder="сообщение"></textarea>
+          <textarea id="text4" rows="3" placeholder="сообщение"></textarea>
+          <textarea id="text5" rows="3" placeholder="сообщение"></textarea>
+        </div>
+      </div>
+      <div class="textareas-row">
+        <textarea
+          id="text6"
+          rows="3"
+          placeholder="Данные водителя / контейнер пломба"
+        ></textarea>
+        <textarea id="text7" rows="3" placeholder="номер машины"></textarea>
+        <input type="date" id="date1" />
+      </div>
+    </div>
+    <button onclick="drawAll()">Нарисовать на всех</button>
+    <button onclick="downloadPDF()">Скачать все в PDF</button>
 
-  <h2>Введите текст и скачайте изображение</h2>
-  <canvas id="myCanvas" width="1241" height="1754"></canvas>
+    <div id="canvasContainer">
+      <div class="canvas-block">
+        <canvas id="canvas1" width="1241" height="1754"></canvas>
+        <button onclick="downloadImage(1)">Скачать 1</button>
+      </div>
+      <div class="canvas-block">
+        <canvas id="canvas2" width="1241" height="1754"></canvas>
+        <button onclick="downloadImage(2)">Скачать 2</button>
+      </div>
+      <div class="canvas-block">
+        <canvas id="canvas3" width="1241" height="1754"></canvas>
+        <button onclick="downloadImage(3)">Скачать 3</button>
+      </div>
+      <div class="canvas-block">
+        <canvas id="canvas4" width="1241" height="1754"></canvas>
+        <button onclick="downloadImage(4)">Скачать 4</button>
+      </div>
+    </div>
 
-  <input type="text" id="textInput" placeholder="Введите текст" />
-    <input type="text" id="textInput2" placeholder="ведите получателя" />
-  <br>
-  <button onclick="drawText()">Обновить текст</button>
-  <button onclick="downloadImage()">Скачать изображение</button>
+    <script>
+      const imageSources = [
+        "DokumentCMR (1)_page-0001.jpg",
+        "DokumentCMR (1)_page-0002.jpg",
+        "DokumentCMR (1)_page-0003.jpg",
+        "DokumentCMR (1)_page-0004.jpg",
+      ];
 
-  <script>
-    const canvas = document.getElementById("myCanvas");
-    const ctx = canvas.getContext("2d");
+      const images = [];
+      const canvases = [];
+      const contexts = [];
 
-    const image = new Image();
-    image.src = "./DokumentCMR_page-0003.jpg"; // Замените на путь к своему изображению
+      for (let i = 0; i < 4; i++) {
+        const img = new Image();
+        img.src = imageSources[i];
+        images.push(img);
 
-    image.onload = function () {
-      drawText(); // Рисуем сразу при загрузке
-    };
+        const canvas = document.getElementById(`canvas${i + 1}`);
+        canvases.push(canvas);
+        contexts.push(canvas.getContext("2d"));
+      }
 
-    function drawText() {
-      const text = document.getElementById("textInput").value;
-      const text2 = document.getElementById("textInput2").value
+      function drawAll() {
+        const text1 = document.getElementById("text1").value;
+        const text2 = document.getElementById("text2").value;
+        const text3 = document.getElementById("text3").value;
+        const text4 = document.getElementById("text4").value;
+        const text5 = document.getElementById("text5").value;
+        const text6 = document.getElementById("text6").value;
+        const text7 = document.getElementById("text7").value;
+        const dateValue = document.getElementById("date1").value; // например: "2025-05-27"
 
-      // Очистка и отрисовка фона
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        images.forEach((img, i) => {
+          if (img.complete) {
+            drawOnCanvas(
+              i,
+              text1,
+              text2,
+              text3,
+              text4,
+              text5,
+              text6,
+              text7,
+              dateValue
+            );
+          } else {
+            img.onload = () => drawOnCanvas(i, text1, text2, text3);
+          }
+        });
+      }
 
-      // Настройка текста
-      ctx.font = "30px Arial";
-      ctx.fillStyle = "black";
-      ctx.fillText(text, 150, 250); // координаты текста
-      ctx.fillText(text2, 150, 350); 
-    }
+      function drawMultiline(ctx, text, x, y, lineHeight = 20) {
+        const lines = text.split("\n");
+        lines.forEach((line, i) => {
+          ctx.fillText(line, x, y + i * lineHeight);
+        });
+      }
 
-    function downloadImage() {
-      const link = document.createElement('a');
-      link.download = 'image-with-text.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }
-  </script>
-</body>
+      function drawOnCanvas(
+        index,
+        text1,
+        text2,
+        text3,
+        text4,
+        text5,
+        text6,
+        text7,
+        dateValue
+      ) {
+        const ctx = contexts[index];
+        const canvas = canvases[index];
+        const img = images[index];
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "black";
+        ctx.textAlign = "left";
+
+        drawMultiline(ctx, text1, 100, 210); // верх
+        drawMultiline(ctx, text2, 100, 350); // центр
+        drawMultiline(ctx, text3, 100, 810); // низ
+        drawMultiline(ctx, text4, 270, 810); // низ 2
+        drawMultiline(ctx, text5, 445, 810); // низ 3
+        drawMultiline(ctx, text6, 630, 350); // данные водителя
+        drawMultiline(ctx, text7, 760, 422); // номер машины
+        drawMultiline(ctx, "Zerniki", 270, 1460); // дата
+        drawMultiline(ctx, dateValue, 445, 1460); // дата
+      }
+
+      function downloadImage(index) {
+        const canvas = canvases[index - 1];
+        const link = document.createElement("a");
+        link.download = `image${index}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      }
+
+      async function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: "portrait",
+          unit: "px",
+          format: [1241, 1754],
+        });
+
+        for (let i = 0; i < canvases.length; i++) {
+          if (i > 0) pdf.addPage();
+          const imgData = canvases[i].toDataURL("image/png");
+          pdf.addImage(imgData, "PNG", 0, 0, 1241, 1754);
+        }
+
+        pdf.save("images.pdf");
+      }
+    </script>
+  </body>
 </html>

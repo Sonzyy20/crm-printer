@@ -40,6 +40,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </head>
   <body>
+    <h2>choose the option</h2>
+    <select  id="deliverRec">
+      <option selected="selected" value="default">choose the option</option>
+      <option value="fan">Fancourier</option>
+      <option value="DPD">DPD</option>
+      <option value="atp">Atpost</option>
+    </select>
+    <button onclick="drawSelect()">print option</button>
     <h2>Введите тексты</h2>
     <div class="textareawrap">
       <div class="textareas-row">
@@ -106,6 +114,7 @@
       }
 
       function drawAll() {
+      const select = document.getElementById("deliverRec").value
         const text1 = document.getElementById("text1").value;
         const text2 = document.getElementById("text2").value;
         const text3 = document.getElementById("text3").value;
@@ -114,7 +123,8 @@
         const text6 = document.getElementById("text6").value;
         const text7 = document.getElementById("text7").value;
         const dateValue = document.getElementById("date1").value; // например: "2025-05-27"
-
+        console.log(select)
+        console.log(text1)
         images.forEach((img, i) => {
           if (img.complete) {
             drawOnCanvas(
@@ -132,6 +142,96 @@
             img.onload = () => drawOnCanvas(i, text1, text2, text3);
           }
         });
+      }
+
+      function drawSelect(){
+        const select = document.getElementById("deliverRec").value
+        const text1 = document.getElementById("text1").value;
+        const text2 = document.getElementById("text2").value;
+        const text3 = document.getElementById("text3").value;
+        const text4 = document.getElementById("text4").value;
+        const text5 = document.getElementById("text5").value;
+        const text6 = document.getElementById("text6").value;
+        const text7 = document.getElementById("text7").value;
+         const dateValue = document.getElementById("date1").value;
+        switch(select){
+          case "fan":
+images.forEach((img, i) => {
+          if (img.complete) {
+            drawOnCanvas(
+              i,
+              text1.value=`GXO
+Skladowa 10
+zerniki 62-023`,
+              text2.value=`FAN Courier HUB International Arad,
+ Intravilan Arad 
+DN69FN, VGP PARK 310059 Rumunia. `,
+              text3,
+              text4,
+              text5,
+              text6,
+              text7,
+              dateValue
+            );
+          } else {
+            img.onload = () => drawOnCanvas(i, text1, text2, text3);
+          }
+        });
+        break;
+        case "DPD":
+          images.forEach((img, i) => {
+          if (img.complete) {
+            drawOnCanvas(
+              i,
+              text1.value=`GXO
+Skladowa 10
+zerniki 62-023`,
+              text2.value=`Fabryczna13,
+Żerniki   `,
+              text3,
+              text4,
+              text5,
+              text6,
+              text7,
+              dateValue
+            );
+          } else {
+            img.onload = () => drawOnCanvas(i, text1, text2, text3);
+          }
+        });
+        break;
+        case "atp":
+          images.forEach((img, i) => {
+          if (img.complete) {
+            drawOnCanvas(
+              i,
+              text1.value=`GXO
+Skladowa 10
+zerniki 62-023`,
+              text2.value=`ATPOST
+Opag hagenbrunn
+Logistikstrasse 15 
+2201 AT, HAGENBRUNN, Austria`,
+              text3,
+              text4,
+              text5,
+              text6,
+              text7,
+              dateValue
+            );
+          } else {
+            img.onload = () => drawOnCanvas(i, text1, text2, text3);
+          }
+        });
+        break;
+        }
+
+
+
+       
+         
+
+
       }
 
       function drawMultiline(ctx, text, x, y, lineHeight = 20) {
@@ -165,6 +265,7 @@
 
         drawMultiline(ctx, text1, 100, 210); // верх
         drawMultiline(ctx, text2, 100, 350); // центр
+        drawMultiline(ctx, text2, 100, 490)
         drawMultiline(ctx, text3, 100, 810); // низ
         drawMultiline(ctx, text4, 270, 810); // низ 2
         drawMultiline(ctx, text5, 445, 810); // низ 3

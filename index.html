@@ -71,6 +71,7 @@
     </div>
     <button onclick="drawAll()">Нарисовать на всех</button>
     <button onclick="downloadPDF()">Скачать все в PDF</button>
+    <button onclick="clearAll()">Очистить все</button>
 
     <div id="canvasContainer">
       <div class="canvas-block">
@@ -273,6 +274,11 @@ Logistikstrasse 15
         drawMultiline(ctx, text7, 760, 422); // номер машины
         drawMultiline(ctx, "Zerniki", 270, 1460); // дата
         drawMultiline(ctx, dateValue, 445, 1460); // дата
+      }
+      function clearAll() {
+        contexts.forEach((ctx, index) => {
+          ctx.clearRect(0, 0, canvases[index].width, canvases[index].height);
+        });
       }
 
       function downloadImage(index) {
